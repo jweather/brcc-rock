@@ -18,3 +18,8 @@ update GroupLocation SET LocationId=1
   
 -- randomize phone numbers
 update PhoneNumber set [Number] = 4340000000 + ABS(CHECKSUM(newid()))%10000000;
+
+-- randomize birthdates
+update Person set [BirthDay] = 1 + ABS(CHECKSUM(newid()))%27;
+update Person set [BirthMonth] = 1 + ABS(CHECKSUM(newid()))%11;
+update Person set [BirthYear] = 1900 + ABS(CHECKSUM(newid()))%100;
