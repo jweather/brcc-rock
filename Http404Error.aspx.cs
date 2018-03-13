@@ -74,44 +74,46 @@ public partial class Http404Error : System.Web.UI.Page
             {
                 Response.StatusCode = 404;
                 lLogoSvg.Text = System.IO.File.ReadAllText( HttpContext.Current.Request.MapPath( "~/Assets/Images/rock-logo-sm.svg" ) );
-				
-				string search = Request.RawUrl.Substring(1).ToLower();
-				
-				RockContext rockContext = new RockContext();
-				
-				int? idp = new AttributeValueService( rockContext ).Queryable()
-					.Where( a => a.Attribute.Key == "ShortURL")
-					.Where( a => a.Attribute.EntityTypeQualifierColumn == "ContentChannelTypeId")
-					.Where( a => a.Value == search )
-					.Select( a => a.EntityId ).FirstOrDefault();
-				
-				if (!idp.HasValue) {
-					// an actual 404
-				} else {
-					int id = idp.Value;
-					
-					ContentChannelItemService ccis = new ContentChannelItemService(new RockContext());
-					ContentChannelItem item = ccis.Queryable().FirstOrDefault(i => i.Id == id);
-					if (item == null) {
-						// odd
-					} else {
-						// magic numbers ahoy
-						int page = 0;
-						if (item.ContentChannelId == 5) page = 506; // messages
-						else if (item.ContentChannelId == 3) page = 499; // stories
-						
-						if (page != 0) {
-							string url = "/page/" + page + "?Item=" + item.Id; // magic values ahoy
-						
-							Response.Redirect(url, false);
-							return;
-						}
-					}
-				}
+                
+                // Jeremy Weatherford jweather@xidus.net
+                // search ChannelContentItems for a matching ShortURL attribute, redirect if pr
+                string search = Request.RawUrl.Substring(1).ToLower();
+                
+                RockContext rockContext = new RockContext();
+                
+                int? idp = new AttributeValueService( rockContext ).Queryable()
+                    .Where( a => a.Attribute.Key == "ShortURL")
+                    .Where( a => a.Attribute.EntityTypeQualifierColumn == "ContentChannelTypeId")
+                    .Where( a => a.Value == search )
+                    .Select( a => a.EntityId ).FirstOrDefault();
+                
+                if (!idp.HasValue) {
+                    // an actual 404
+                } else {
+                    int id = idp.Value;
+                    
+                    ContentChannelItemService ccis = new ContentChannelItemService(new RockContext());
+                    ContentChannelItem item = ccis.Queryable().FirstOrDefault(i => i.Id == id);
+                    if (item == null) {
+                        // odd
+                    } else {
+                        // magic numbers ahoy
+                        int page = 0;
+                        if (item.ContentChannelId == 5) page = 506; // messages
+                        else if (item.ContentChannelId == 3) page = 499; // stories
+                        
+                        if (page != 0) {
+                            string url = "/page/" + page + "?Item=" + item.Id; // magic values ahoy
+                        
+                            Response.Redirect(url, false);
+                            return;
+                        }
+                    }
+                }
             }
-			
-			// really 404
-			Response.Redirect("/page/504", false);
+            
+            // really 404
+            Response.Redirect("/page/504", false);
         }
         catch (Exception e2)
         {
