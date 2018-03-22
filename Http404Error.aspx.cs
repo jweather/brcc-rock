@@ -16,6 +16,7 @@
 //
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Web;
 using System.Web.UI;
@@ -76,48 +77,29 @@ public partial class Http404Error : System.Web.UI.Page
                 lLogoSvg.Text = System.IO.File.ReadAllText( HttpContext.Current.Request.MapPath( "~/Assets/Images/rock-logo-sm.svg" ) );
                 
                 // Jeremy Weatherford jweather@xidus.net
-                // search ChannelContentItems for a matching ShortURL attribute, redirect if pr
-                string search = Request.RawUrl.Substring(1).ToLower();
+                // use BRShortLinks table to redirect to a matching Url
+                // see BRShortLinks.aspx.cs for where they come from
                 
-                RockContext rockContext = new RockContext();
-                
-                int? idp = new AttributeValueService( rockContext ).Queryable()
-                    .Where( a => a.Attribute.Key == "ShortURL")
-                    .Where( a => a.Attribute.EntityTypeQualifierColumn == "ContentChannelTypeId")
-                    .Where( a => a.Value == search )
-                    .Select( a => a.EntityId ).FirstOrDefault();
-                
-                if (!idp.HasValue) {
-                    // an actual 404
-                } else {
-                    int id = idp.Value;
-                    
-                    ContentChannelItemService ccis = new ContentChannelItemService(new RockContext());
-                    ContentChannelItem item = ccis.Queryable().FirstOrDefault(i => i.Id == id);
-                    if (item == null) {
-                        // odd
-                    } else {
-                        // magic numbers ahoy
-                        int page = 0;
-                        if (item.ContentChannelId == 5) page = 506; // messages
-                        else if (item.ContentChannelId == 3) page = 499; // stories
-                        
-                        if (page != 0) {
-                            string url = "/page/" + page + "?Item=" + item.Id; // magic values ahoy
-                        
-                            Response.Redirect(url, false);
-                            return;
-                        }
-                    }
+                string search = Request.RawUrl.ToLower();
+                var p = new Dictionary<string,object>();
+                p.Add("@link", search);
+                var res = DbService.ExecuteScaler("SELECT [url] FROM BRShortLinks WHERE [link]=@link",
+                    CommandType.Text, p);
+                if (res != null) {
+                    string link = (string)res;
+                    // shortlink success
+                    Response.Redirect(link, false);
+                    return;
                 }
             }
             
-            // really 404
+            // really 404 -- todo, log it
             Response.Redirect("/page/504", false);
         }
         catch (Exception e2)
         {
             Response.Redirect("/page/504", false);
+            //lLogoSvg.Text = e2.Message;
         }
     }
 }
