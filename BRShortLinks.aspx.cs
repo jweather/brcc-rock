@@ -169,19 +169,15 @@ public partial class BRShortLinks : System.Web.UI.Page
             List<string> adds = links.Keys.ToList();
             
             // iterate existing links and itemize changes
-            bool dirty = false;
             var table = DbService.GetDataTable("SELECT link,url FROM BRShortLinks", CommandType.Text, null);
             d(table.Rows.Count + " existing links in DB");
             foreach (DataRow row in table.Rows) {
                 string link = row[0].ToString(), url = row[1].ToString();
                 if (!links.ContainsKey(link)) {
                     deletes.Add(link);
-                    dirty = true;
                 } else if (links[link] == url) {
                     // no changes needed
                     adds.Remove(link);
-                } else {
-                    dirty = true;
                 }
             }
             
@@ -204,10 +200,7 @@ public partial class BRShortLinks : System.Web.UI.Page
                 if (debug) d("deleting " + link);
             }
             
-            if (!dirty)
-                d("database already up to date");
-            else
-                d(adds.Count + " links added/updated, " + deletes.Count() + " links deleted");
+            d(adds.Count + " links added/updated, " + deletes.Count() + " links deleted");
             
             d("<p>");
             // debug dump of shortlink table
@@ -216,7 +209,7 @@ public partial class BRShortLinks : System.Web.UI.Page
             }
             
             // pet the watchdog
-            var res = new WebClient().DownloadString("http://zenithav.net/watchdog.php?key=BRShortLinks-" + Environment.MachineName);
+            var res = new WebClient().DownloadString("http://zenithav.net/watchdog.php?key=BRShortLinks" + Environment.MachineName);
         }
         catch (Exception e2)
         {
