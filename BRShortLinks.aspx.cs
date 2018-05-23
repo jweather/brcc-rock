@@ -103,11 +103,12 @@ public partial class BRShortLinks : System.Web.UI.Page
                 .Where( a => a.Attribute.Key == "ShortURL")
                 .Where( a => a.Attribute.EntityTypeQualifierColumn == "EventCalendarId" );
             foreach (var attr in attrs) {
-                string linkText = attr.Value;
+                string linkText = attr.Value.Trim();
                 int id = attr.EntityId.Value;
                 var item = new EventCalendarItemService(new RockContext()).Queryable()
                     .FirstOrDefault(i => i.Id == id);
-                if (item != null) {
+                if (item != null && linkText != "") {
+                    d(item.EventItemId);
                     string url = "/page/505?EventItemId=" + item.EventItemId;
                     
                     foreach (string s in linkText.Split(' ')) {
