@@ -9,6 +9,7 @@ update FinancialTransactionDetail set [Amount] = ABS(CHECKSUM(newid()))%100;
 update FinancialTransaction set [CreatedDateTime] = DATEADD(day, (ABS(CHECKSUM(NEWID())) % 65530), 0);
 update FinancialTransaction set [TransactionDateTime] = DATEADD(day, (ABS(CHECKSUM(NEWID())) % 65530), 0);
 update FinancialTransactionDetail set [CreatedDateTime] = DATEADD(day, (ABS(CHECKSUM(NEWID())) % 65530), 0);
+update FinancialTransaction set [TransactionCode] = ABS(CHECKSUM(newid()))%10000;
 
 -- replace pledges with random numbers between $0 and $100
 update FinancialPledge set [TotalAmount] = ABS(CHECKSUM(newid()))%100;
