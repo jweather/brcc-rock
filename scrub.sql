@@ -5,6 +5,10 @@
 -- replace giving with random numbers between $0 and $100
 update FinancialTransactionDetail set [Amount] = ABS(CHECKSUM(newid()))%100;
 
+-- randomize giving date/time
+update FinancialTransaction set [CreatedDateTime] = DATEADD(day, (ABS(CHECKSUM(NEWID())) % 65530), 0);
+update FinancialTransactionDetail set [CreatedDateTime] = DATEADD(day, (ABS(CHECKSUM(NEWID())) % 65530), 0);
+
 -- replace pledges with random numbers between $0 and $100
 update FinancialPledge set [TotalAmount] = ABS(CHECKSUM(newid()))%100;
 
