@@ -81,6 +81,9 @@ public partial class Http404Error : System.Web.UI.Page
                 // see BRShortLinks.aspx.cs for where they come from
                 
                 string search = Request.RawUrl.ToLower();
+                int idx = search.IndexOf("?");
+                if (idx != -1) search = search.Substring(0, idx); // stop at ?
+				
                 var p = new Dictionary<string,object>();
                 p.Add("@link", search);
                 var res = DbService.ExecuteScaler("SELECT [url] FROM BRShortLinks WHERE [link]=@link",

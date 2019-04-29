@@ -72,10 +72,10 @@ public partial class BRShortLinks : System.Web.UI.Page
         
         // these shortlinks are used by Http404Error.aspx.cs to redirect
         
-        bool debug = false;
+        bool debug = true;
         try
         {
-            Dictionary<string,string> links = new Dictionary<string,string>();
+			Dictionary<string,string> links = new Dictionary<string,string>();
             List<string> duplicates = new List<string>();
             
             var rockContext = new RockContext();
@@ -108,7 +108,6 @@ public partial class BRShortLinks : System.Web.UI.Page
                 var item = new EventCalendarItemService(new RockContext()).Queryable()
                     .FirstOrDefault(i => i.Id == id);
                 if (item != null && linkText != "") {
-                    d(item.EventItemId);
                     string url = "/page/505?EventItemId=" + item.EventItemId;
                     
                     foreach (string s in linkText.Split(' ')) {
@@ -143,9 +142,9 @@ public partial class BRShortLinks : System.Web.UI.Page
             foreach (var item in posts) {
                 string link = "/posts/" + canonicalize(item.Title);
                 if (links.ContainsKey(link)) {
-                    duplicates.Add(link + " duplicated by Message " + item.Id + ": " + item.Title);
+                    duplicates.Add(link + " duplicated by Post " + item.Id + ": " + item.Title);
                 } else {
-                    string target = "/Page/498?Item=" + item.Id;
+                    string target = "/Page/499?Item=" + item.Id;
                     links.Add(link, target);    
                 }
             }
